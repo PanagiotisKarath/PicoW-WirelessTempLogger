@@ -1,15 +1,13 @@
 #include <stdio.h>
 #include <string.h>
-
 #include "pico/stdlib.h"
 #include "pico/cyw43_arch.h"
-
 #include "lwip/pbuf.h"
 #include "dhcpserver.h"
-
 #include "sd_card.h"
 #include "ff.h"
 #include "hardware/adc.h"
+#include "temperature.h"
 
 #define BUTTON_PIN 5
 
@@ -20,15 +18,6 @@ volatile bool button_pressed = false;
 
 void gpio_callback(uint gpio, uint32_t events){
     button_pressed = true;
-}
-
-//Function that reads the onboard temp sensor and returns its value in Celsius
-float read_temperature(){
-        const float conv_factor = 3.3f / (1<<12);
-        float adc = (float)adc_read() * conv_factor;
-        float tempC = 27.0f - (adc - 0.706f)/0.001721f;
-
-        return tempC;
 }
 
 static void udp_recv_function(void *arg, struct udp_pcb *recv_pcb, struct pbuf *p, const ip_addr_t *source_addr, u16_t source_port) {

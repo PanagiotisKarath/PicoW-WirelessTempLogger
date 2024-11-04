@@ -30,6 +30,7 @@ add_executable(${A}
     src/access_point.c
     dhcpserver/dhcpserver.c
     src/hw_config_ap.c
+    src/temperature.c
 )
 pico_enable_stdio_usb(${A} 0) #Not using USB
 pico_enable_stdio_uart(${A} 1) #Using UART
