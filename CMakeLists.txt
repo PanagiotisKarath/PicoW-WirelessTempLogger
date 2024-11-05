@@ -31,6 +31,8 @@ add_executable(${A}
     dhcpserver/dhcpserver.c
     src/hw_config_ap.c
     src/temperature.c
+    src/wireless.c
+    src/filesystem.c
 )
 pico_enable_stdio_usb(${A} 0) #Not using USB
 pico_enable_stdio_uart(${A} 1) #Using UART
@@ -68,6 +70,7 @@ set(B "station") #Variable B is defined as the station
 #Define project files
 add_executable(${B}
     src/station.c
+    src/wireless.c
 )
 pico_enable_stdio_usb(${B} 0) #Not using USB
 pico_enable_stdio_uart(${B} 1) #Using UART

@@ -8,60 +8,18 @@
 #include "ff.h"
 #include "hardware/adc.h"
 #include "temperature.h"
+#include "filesystem.h"
+#include "wireless.h"
 
 #define BUTTON_PIN 5
 
-static const int port = WIFI_PORT; //WIFI_PORT is defined in CMakeLists.txt as
+const int port = WIFI_PORT; //WIFI_PORT is defined in CMakeLists.txt as
                                    //port 8080
-static const TCHAR* filename = "temp.txt";                                   
+const TCHAR* filename = "temp.txt";                                   
 volatile bool button_pressed = false; 
 
 void gpio_callback(uint gpio, uint32_t events){
     button_pressed = true;
-}
-
-static void udp_recv_function(void *arg, struct udp_pcb *recv_pcb, struct pbuf *p, const ip_addr_t *source_addr, u16_t source_port) {
-    printf("Message received\r\n");
-
-    //Unused parameters are casted as void. Not casting might result in 
-    //warnings
-    (void)arg;
-    (void)recv_pcb;
-    (void)source_port;
-    (void)source_addr;
-
-    //Message is "extracted" from the packet buffer received and stored in an
-    //array.
-    char received_message[p->tot_len];
-    memcpy(received_message, p->payload, p->tot_len);
-
-    //Access point expects the character string "temp sense" in order to read 
-    //the on-board temperature sensor. The received and expected messages are 
-    //compared and if they are the same a temperature reading is made.
-    if(strcmp(received_message, "temp sense") == 0) {
-        float temperature = read_temperature();
-        FIL fil;
-        FRESULT fr;
-
-        fr = f_open(&fil, filename, FA_WRITE | FA_OPEN_APPEND);
-        if(fr != FR_OK) {
-            printf("ERROR: Could not open file (%d)\r\n", fr);
-            while(true);
-        }
-
-        int ret = f_printf(&fil, "T = %fC\r\n", temperature);
-        if(ret < 0) {
-            printf("ERROR: Could not write to file (%d)", ret);
-            f_close(&fil);
-            while(true);
-        }
-
-        fr = f_close(&fil);
-        if(fr != FR_OK) {
-            printf("ERROR: Could not close file (%d)\r\n", fr);
-            while(true);
-        }
-    }
 }
 
 int main(){
@@ -88,9 +46,7 @@ int main(){
     gpio_set_irq_enabled_with_callback(BUTTON_PIN, GPIO_IRQ_EDGE_FALL, true, &gpio_callback);
 
     //Configure ADC to sense temperature
-    adc_init();
-    adc_set_temp_sensor_enabled(true);
-    adc_select_input(4);
+    adc_temp_config();
 
     /*
     * Initialise SD card with sd_init_driver(). This function returns a boolean
@@ -147,7 +103,7 @@ int main(){
     if (ERR_OK != udp_bind(udp, IP4_ADDR_ANY, port)) {
         printf("\nfailed to bind to port %u", port);
     }
-    udp_recv(udp, udp_recv_function, (void*)NULL);
+    udp_recv(udp, ap_udp_recv_fn, (void*)NULL);
 
     printf("All set, entering while loop now\r\n");
     while(true) {
