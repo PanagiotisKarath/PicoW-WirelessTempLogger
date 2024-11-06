@@ -44,6 +44,8 @@ float mcp9808_convert_temperature(uint8_t upper_byte, uint8_t lower_byte) {
 }
 
 float read_temperature() {
+    //Buffer that will hold the 2 bytes that contain the ambient temperature
+    //information
     uint8_t buf[2];
     uint16_t upper_byte;
     uint16_t lower_byte;
@@ -54,27 +56,7 @@ float read_temperature() {
     
     upper_byte = buf[0];
     lower_byte = buf[1];
-
+    
     float temp_celsius = mcp9808_convert_temperature(upper_byte & 0x1F, lower_byte);
     return temp_celsius;
 }
-
-
-
-/*
-//Reads the on board temperature sensor
-float read_temperature() {
-    const float conv_factor = 3.3f / (1<<12);
-    float adc = (float)adc_read() * conv_factor;
-    float temp_c = 27.0f - (adc - 0.706f)/0.001721f;
-
-    return temp_c;
-}
-
-//Sets up the adc to read the temperature sensor
-void adc_temp_config() {
-    adc_init();
-    adc_set_temp_sensor_enabled(true);
-    adc_select_input(4);
-}
-*/
