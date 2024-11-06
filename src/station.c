@@ -5,10 +5,13 @@
 #include "lwip/udp.h"
 #include "wireless.h"
 
-#define BUTTON_PIN 15 //Button is connected to GPIO pin 15 (physical pin 20)
+//Button is connected to GPIO pin 15 (physical pin 20)
+#define BUTTON_PIN 15 
 
-volatile bool button_pressed = false; //button pressed bool is false by default. Volatile because it can change at any moment
-const int port = WIFI_PORT; //WIFI_PORT is defined in CMakeLists.txt as 8080
+//Volatile because it can change at any moment
+volatile bool button_pressed = false; 
+//WIFI_PORT is defined in CMakeLists.txt as 8080
+const int port = WIFI_PORT; 
 
 //Interrupt Service Routine
 void gpio_callback(uint gpio, uint32_t events){
@@ -56,11 +59,13 @@ int main(){
     while(true){
         //button_pressed is made true by the interrupt service routine
         if(button_pressed == true){
-            sleep_ms(250); //debounce time
+            sleep_ms(250); //Debounce time
             send_message(&remote_address, "temp sense");
         }
-        sleep_ms(100); //sleep for 100 ms
-        cyw43_arch_poll();//Poll the cyw43 architecture to process any pending events. Must be called regularly
+        //Poll the cyw43 architecture to process any pending events.
+        //Must be called regularly.
+        sleep_ms(100); 
+        cyw43_arch_poll();
     }
 
     return 0;
