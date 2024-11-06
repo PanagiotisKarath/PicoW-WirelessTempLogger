@@ -56,7 +56,7 @@ target_link_libraries(${A}
     pico_cyw43_arch_lwip_poll
     pico_stdlib
     FatFs_SPI
-    hardware_adc
+    hardware_i2c
 )
 
 #Creates .map / .bin / .hex / .uf2 / etc files

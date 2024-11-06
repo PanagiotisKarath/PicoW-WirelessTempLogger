@@ -6,12 +6,11 @@
 #include "dhcpserver.h"
 #include "sd_card.h"
 #include "ff.h"
-#include "hardware/adc.h"
 #include "temperature.h"
 #include "filesystem.h"
 #include "wireless.h"
 
-#define BUTTON_PIN 5
+#define BUTTON_PIN 3
 
 const int port = WIFI_PORT; //WIFI_PORT is defined in CMakeLists.txt as
                                    //port 8080
@@ -30,7 +29,6 @@ int main(){
     * are defined here.
     */
     FATFS fs;
-    //FIL fil;
     FRESULT fr;    
     int ret;
     char filename[] = "temp.txt";
@@ -45,8 +43,8 @@ int main(){
     gpio_pull_up(BUTTON_PIN);
     gpio_set_irq_enabled_with_callback(BUTTON_PIN, GPIO_IRQ_EDGE_FALL, true, &gpio_callback);
 
-    //Configure ADC to sense temperature
-    adc_temp_config();
+    //Configure I2C to sense temperature
+    i2c_temperature_config();
 
     /*
     * Initialise SD card with sd_init_driver(). This function returns a boolean
