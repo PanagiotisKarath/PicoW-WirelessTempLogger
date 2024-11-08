@@ -71,6 +71,8 @@ set(B "station") #Variable B is defined as the station
 add_executable(${B}
     src/station.c
     src/wireless.c
+    src/hw_config_ap.c
+    src/filesystem.c
 )
 pico_enable_stdio_usb(${B} 0) #Not using USB
 pico_enable_stdio_uart(${B} 1) #Using UART
@@ -91,6 +93,7 @@ target_compile_definitions(${B} PRIVATE
 target_link_libraries(${B}
     pico_cyw43_arch_lwip_threadsafe_background
     pico_stdlib
+    FatFs_SPI
 )
 
 #Creates .map / .bin / .hex / .uf2 / etc files

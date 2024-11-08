@@ -3,12 +3,10 @@
 #include "ff.h"
 #include "filesystem.h"
 
-extern const TCHAR* filename;
-
 //Opens the file, writes the temperature inside and closes it.
 //FA_OPEN_APPEND makes sure that it writes at the end of the file, and does not
 //overwrite the previous writes. If the files does not exist it creates it.
-void file_write_temperature(float temperature) {
+void file_write_temperature(float temperature, const TCHAR* filename) {
     FIL fil;
     FRESULT fr;
 

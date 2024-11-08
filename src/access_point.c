@@ -14,7 +14,7 @@
 
 const int port = WIFI_PORT; //WIFI_PORT is defined in CMakeLists.txt as
                                    //port 8080
-const TCHAR* filename = "temp.txt";                                   
+const TCHAR* ap_filename = "ap_temp.txt";                                   
 volatile bool button_pressed = false; 
 
 void gpio_callback(uint gpio, uint32_t events){
@@ -31,7 +31,6 @@ int main(){
     FATFS fs;
     FRESULT fr;    
     int ret;
-    char filename[] = "temp.txt";
 
     stdio_init_all(); //Initialise all standard I/O interfaces
     
@@ -103,7 +102,7 @@ int main(){
     }
     udp_recv(udp, ap_udp_recv_fn, (void*)NULL);
 
-    printf("All set, entering while loop now\r\n");
+    printf("(ACCESS POINT) All set, entering while loop now\r\n");
     while(true) {
         cyw43_arch_poll();
         sleep_ms(1);
@@ -113,9 +112,8 @@ int main(){
         }
     }
 
-    /*
-    * Turn on the LED so we know the program is done.
-    */
+    
+    //Turn on the LED so we know the program is done.
     cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
 
     while(true) {
