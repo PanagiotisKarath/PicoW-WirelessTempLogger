@@ -102,7 +102,6 @@ int main(){
     }
     udp_recv(udp, ap_udp_recv_fn, (void*)NULL);
 
-    printf("(ACCESS POINT) All set, entering while loop now\r\n");
     while(true) {
         cyw43_arch_poll();
         sleep_ms(1);

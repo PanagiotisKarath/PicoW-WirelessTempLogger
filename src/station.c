@@ -107,7 +107,6 @@ int main(){
     }
     udp_recv(udp, sta_udp_recv_fn, (void*)NULL);
     
-    printf("(STATION) All set, entering while loop now\r\n");
     while(true){
         if(message_button_pressed) {
             sleep_ms(250); //Debounce time
