@@ -42,3 +42,8 @@ Below I attached images of the station and the access point layouts.
 
 ## Binaries Folder
 In case you are not interested in building the project, both the .uf2 and .elf files are included in the "bin" folder, where they can be simply loaded on 2 Pico W boards.
+
+## Other repositories used
+This project was based on two others, in order to add the DHCP Server and the FAT32 filesystem. The DHCP Server implementation is part of the MicroPython project. These are the links to both of them:
+* [MicroPython project](http://micropython.org/) and as a result the DHCP Server implementation
+* [FAT32 for RPi Pico](https://github.com/carlk3/no-OS-FatFS-SD-SPI-RPi-Pico)
