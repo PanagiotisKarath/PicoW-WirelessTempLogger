@@ -4,6 +4,7 @@
 #include "lwip/pbuf.h"
 #include "lwip/udp.h"
 #include "wireless.h"
+#include "sd_card.h"
 #include "ff.h"
 
 //Button is connected to GPIO pin 15 (physical pin 20)
