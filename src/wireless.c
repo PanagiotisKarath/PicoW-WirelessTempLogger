@@ -2,15 +2,15 @@
 #include <string.h>
 #include "wireless.h"
 #include "lwip/udp.h"
-#include "ff.h"
-#include "filesystem.h"
+#include "fs_utils.h"
 
-extern const TCHAR* ap_filename;
-extern const TCHAR* sta_filename;
+//extern const *char ap_filename;
+//extern const *char sta_filename;
 extern volatile bool message_button_pressed;
 extern const int port;
 
 void send_message(const ip_addr_t* remote_address, const char* message) {
+    printf("SENDING MESSAGE\n"); // DEBUG
     //Boolean variable is set to false so it can be pressed again
     message_button_pressed = false;
 
@@ -35,6 +35,7 @@ void send_message(const ip_addr_t* remote_address, const char* message) {
 }
 
 void send_temperature(const ip_addr_t* source_address, float* temperature) {
+    printf("SENDING TEMPERATURE"); //DEBUG
     //Create packet buffer and make it carry the temperature variable
     struct pbuf* p = pbuf_alloc(PBUF_TRANSPORT, sizeof(float), PBUF_RAM);
     memcpy(p->payload, temperature, sizeof(float));
@@ -46,7 +47,7 @@ void send_temperature(const ip_addr_t* source_address, float* temperature) {
     udp_connect(pcb, source_address, port);
     int err = udp_send(pcb, p);
     if (err != ERR_OK) {
-        printf("\nERROR: message could not be sent (%d)");
+        printf("\nERROR: message could not be sent (%d)", err);
     } 
     
     //Deallocate the memory used for creating the pbuf and the udp pcb
@@ -55,6 +56,7 @@ void send_temperature(const ip_addr_t* source_address, float* temperature) {
 }
 
 void ap_udp_recv_fn(void* arg, struct udp_pcb* recv_pcb, struct pbuf* p, const ip_addr_t* source_addr, u16_t source_port) {
+    printf("MESSAGE RECEIVED"); //DEBUG
     //Print a confirmation message
     printf("Message received\r\n");
 
@@ -72,12 +74,13 @@ void ap_udp_recv_fn(void* arg, struct udp_pcb* recv_pcb, struct pbuf* p, const i
     //compared and if they are the same a temperature reading is made.
     if(strcmp(received_message, "temp sense") == 0) {
         float temperature = read_temperature();
-        file_write_temperature(temperature, ap_filename);
+        flash_file_write_temperature(temperature);
         send_temperature(source_addr, &temperature);
     }
 }
 
 void sta_udp_recv_fn(void* arg, struct udp_pcb* recv_pcb, struct pbuf* p, const ip_addr_t* source_addr, u16_t source_port) {
+    printf("TEMPERATURE RECEIVED"); //DEBUG
     //Confirmation message
     printf("Temperature received\r\n");
 
@@ -92,5 +95,5 @@ void sta_udp_recv_fn(void* arg, struct udp_pcb* recv_pcb, struct pbuf* p, const 
     memcpy(&remote_temp, p->payload, sizeof(float));
 
     //Store temperature in SD card
-    file_write_temperature(remote_temp, sta_filename);
+    sd_file_write_temperature(remote_temp);
 }

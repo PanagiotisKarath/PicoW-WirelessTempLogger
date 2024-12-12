@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.13)
 
 #Define project's and executable's name
-set(PROJECT_NAME wifi_temp_sense)
+set(PROJECT_NAME wifi_temp_sense_vfs)
 
 include(pico_sdk_import.cmake) #Include pico-sdk files
 project(${PROJECT_NAME} C CXX ASM) #Required languages
@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD 17) #Define C++ standard
 pico_sdk_init() #Initialise the pico-sdk
 
 #Tell CMake where to find other source code
-add_subdirectory(lib/no-OS-FatFS-SD-SPI-RPi-Pico/FatFs_SPI build)
+add_subdirectory(pico-vfs)
 
 # ==========================================================================
 # Settings that are common for both the Access Point and the Station pico
@@ -29,10 +29,9 @@ set(A "access_point") #Variable A is defined as the access point
 add_executable(${A}
     src/access_point.c
     dhcpserver/dhcpserver.c
-    src/hw_config_ap.c
     src/temperature.c
     src/wireless.c
-    src/filesystem.c
+    src/fs_utils.c
 )
 pico_enable_stdio_usb(${A} 0) #Not using USB
 pico_enable_stdio_uart(${A} 1) #Using UART
@@ -44,20 +43,32 @@ target_include_directories(${A} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/dhcpserver
 )
 
-#Adding preprocessor definitions to the access point (Macros)
+#Adding preprocessor definitions for the access point
 target_compile_definitions(${A} PRIVATE
     WIFI_SSID=\"${WIFI_SSID}\"
     PASSWORD=\"${PASSWORD}\"
     WIFI_PORT=${WIFI_PORT}
 )
 
+#Specify that littlefs filesystem is used for the Access Point
+target_compile_definitions(${A} PRIVATE USE_FLASH_LFS)
+
 #Linking required libraries
 target_link_libraries(${A}
     pico_cyw43_arch_lwip_poll
     pico_stdlib
-    FatFs_SPI
     hardware_i2c
+    blockdevice_flash
+    blockdevice_heap
+    blockdevice_loopback
+    blockdevice_sd
+    filesystem_fat
+    filesystem_littlefs
+    filesystem_vfs
 )
+
+#Enable the filesystem for the access point
+pico_enable_filesystem(${A} FS_INIT src/fs_init.c)
 
 #Creates .map / .bin / .hex / .uf2 / etc files
 pico_add_extra_outputs(${A})
@@ -71,8 +82,7 @@ set(B "station") #Variable B is defined as the station
 add_executable(${B}
     src/station.c
     src/wireless.c
-    src/hw_config_ap.c
-    src/filesystem.c
+    src/fs_utils.c
 )
 pico_enable_stdio_usb(${B} 0) #Not using USB
 pico_enable_stdio_uart(${B} 1) #Using UART
@@ -80,6 +90,7 @@ pico_enable_stdio_uart(${B} 1) #Using UART
 #Included directories for the station
 target_include_directories(${B} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}
+    ${CMAKE_CURRENT_LIST_DIR/src}
 )
 
 #Adding preprocessor definitions to the station (Macros)
@@ -89,12 +100,24 @@ target_compile_definitions(${B} PRIVATE
     WIFI_PORT=${WIFI_PORT}
 )
 
+#Specify that FAT filesystem is used for the Station
+target_compile_definitions(${B} PRIVATE USE_SD_FAT)
+
 #Linking required libraries
 target_link_libraries(${B}
     pico_cyw43_arch_lwip_threadsafe_background
     pico_stdlib
-    FatFs_SPI
+    blockdevice_flash
+    blockdevice_heap
+    blockdevice_loopback
+    blockdevice_sd
+    filesystem_fat
+    filesystem_littlefs
+    filesystem_vfs
 )
+
+#Enable the filesystem for the access point
+pico_enable_filesystem(${B} FS_INIT src/fs_init.c)
 
 #Creates .map / .bin / .hex / .uf2 / etc files
 pico_add_extra_outputs(${B})

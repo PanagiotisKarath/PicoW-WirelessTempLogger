@@ -9,13 +9,13 @@
 static uint8_t ADDRESS = 0x18;
 
 //Hardware registers. Not all will be used in this project.
-static uint8_t REG_POINTER = 0x00;
-static uint8_t REG_CONFIG = 0x01;
-static uint8_t REG_TEMP_UPPER = 0x02;
-static uint8_t REG_TEMP_LOWER = 0x03;
-static uint8_t REG_TEMP_CRIT = 0x04;
+//static uint8_t REG_POINTER = 0x00;
+//static uint8_t REG_CONFIG = 0x01;
+//static uint8_t REG_TEMP_UPPER = 0x02;
+//static uint8_t REG_TEMP_LOWER = 0x03;
+//static uint8_t REG_TEMP_CRIT = 0x04;
 static uint8_t REG_TEMP_AMB = 0x05;
-static uint8_t REG_RESOLUTION = 0x08;
+//static uint8_t REG_RESOLUTION = 0x08;
 
 //Initialise i2c to read the temperature from mcp9808 sensor
 void i2c_temperature_config() {
